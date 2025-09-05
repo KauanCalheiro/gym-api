@@ -17,6 +17,7 @@ return new class () extends Migration {
     {
         Schema::create($this->muscleGroup->getTable(), function (Blueprint $table) {
             $table->id();
+            $table->text('name');
             $table->timestamps();
             $table->softDeletes();
         });
