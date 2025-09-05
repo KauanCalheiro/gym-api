@@ -27,4 +27,9 @@ enum PermissionEnum: string
     case READ_CITY   = 'city.read';
     case UPDATE_CITY = 'city.update';
     case DELETE_CITY = 'city.delete';
+
+    case CREATE_MUSCLE_GROUP = 'muscle_group.create';
+    case READ_MUSCLE_GROUP   = 'muscle_group.read';
+    case UPDATE_MUSCLE_GROUP = 'muscle_group.update';
+    case DELETE_MUSCLE_GROUP = 'muscle_group.delete';
 }
