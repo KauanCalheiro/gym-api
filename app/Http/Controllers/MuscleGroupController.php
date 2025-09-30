@@ -12,7 +12,7 @@ class MuscleGroupController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(MuscleGroup::class, 'muscleGroup');
+        $this->authorizeResource(MuscleGroup::class, 'muscle_group');
     }
 
     public function index()
