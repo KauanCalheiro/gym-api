@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\MuscleGroupController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +23,7 @@ Route::prefix('v1')->group(function () {
         Route::post('user/{user}/roles/assign', [UserController::class, 'assignRoles'])->name('user.roles.assign');
         Route::post('user/{user}/roles/revoke', [UserController::class, 'revokeRoles'])->name('user.roles.revoke');
         Route::post('user/{user}/roles/sync', [UserController::class, 'syncRoles'])->name('user.roles.sync');
+
+        Route::apiResource('muscle-group', MuscleGroupController::class)->names('muscle-group');
     });
 });
