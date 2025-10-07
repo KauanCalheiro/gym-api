@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Spatie\QueryBuilder\Filters\Search\SearchFilter;
 use App\Http\Requests\StoreMuscleGroupRequest;
 use App\Http\Requests\UpdateMuscleGroupRequest;
 use App\Http\Resources\MuscleGroupResource;
 use App\Models\MuscleGroup;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MuscleGroupController extends Controller
@@ -18,8 +20,18 @@ class MuscleGroupController extends Controller
     public function index()
     {
         $muscleGroups = QueryBuilder::for(MuscleGroup::class)
-            ->allowedFilters(['name'])
-            ->allowedSorts(['id', 'name'])
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                'name',
+                AllowedFilter::custom(
+                    'search',
+                    new SearchFilter([
+                        'id',
+                        'name',
+                    ]),
+                ),
+            ])
+            ->defaultSort('name')
             ->jsonPaginate();
 
         return MuscleGroupResource::collection($muscleGroups);
