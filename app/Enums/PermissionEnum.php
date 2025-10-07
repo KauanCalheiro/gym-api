@@ -32,4 +32,9 @@ enum PermissionEnum: string
     case READ_MUSCLE_GROUP   = 'muscle-group.read';
     case UPDATE_MUSCLE_GROUP = 'muscle-group.update';
     case DELETE_MUSCLE_GROUP = 'muscle-group.delete';
+
+    case CREATE_EXERCISE = 'exercise.create';
+    case READ_EXERCISE   = 'exercise.read';
+    case UPDATE_EXERCISE = 'exercise.update';
+    case DELETE_EXERCISE = 'exercise.delete';
 }

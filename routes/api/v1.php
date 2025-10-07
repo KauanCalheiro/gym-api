@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\Location\CityController;
 use App\Http\Controllers\Location\CountryController;
 use App\Http\Controllers\Location\StateController;
@@ -32,5 +33,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('city', CityController::class)->names('city');
 
         Route::apiResource('muscle-group', MuscleGroupController::class)->names('muscle-group');
+        Route::apiResource('exercise', ExerciseController::class)->names('exercise');
     });
 });

@@ -15,10 +15,12 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        User::class    => UserPolicy::class,
-        Country::class => CountryPolicy::class,
-        State::class   => StatePolicy::class,
-        City::class    => CityPolicy::class,
+        User::class        => UserPolicy::class,
+        Country::class     => CountryPolicy::class,
+        State::class       => StatePolicy::class,
+        City::class        => CityPolicy::class,
+        Exercise::class    => ExercisePolicy::class,
+        MuscleGroup::class => MuscleGroupPolicy::class,
     ];
 
     public function boot()
