@@ -37,4 +37,9 @@ enum PermissionEnum: string
     case READ_EXERCISE   = 'exercise.read';
     case UPDATE_EXERCISE = 'exercise.update';
     case DELETE_EXERCISE = 'exercise.delete';
+
+    case CREATE_WORKOUT = 'workout.create';
+    case READ_WORKOUT   = 'workout.read';
+    case UPDATE_WORKOUT = 'workout.update';
+    case DELETE_WORKOUT = 'workout.delete';
 }
