@@ -7,6 +7,8 @@ use App\Http\Controllers\Location\CountryController;
 use App\Http\Controllers\Location\StateController;
 use App\Http\Controllers\MuscleGroupController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkoutController;
+use App\Http\Controllers\WorkoutExerciseController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -34,5 +36,7 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('muscle-group', MuscleGroupController::class)->names('muscle-group');
         Route::apiResource('exercise', ExerciseController::class)->names('exercise');
+        Route::apiResource('workout', WorkoutController::class)->names('workout');
+        Route::apiResource('workout-exercise', WorkoutExerciseController::class)->names('workout-exercise');
     });
 });
