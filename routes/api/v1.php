@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ExerciseController;
+use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\Location\CityController;
 use App\Http\Controllers\Location\CountryController;
 use App\Http\Controllers\Location\StateController;
@@ -38,5 +39,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('exercise', ExerciseController::class)->names('exercise');
         Route::apiResource('workout', WorkoutController::class)->names('workout');
         Route::apiResource('workout-exercise', WorkoutExerciseController::class)->names('workout-exercise');
+        Route::apiResource('exercise-log', ExerciseLogController::class)->names('exercise-log');
     });
 });
