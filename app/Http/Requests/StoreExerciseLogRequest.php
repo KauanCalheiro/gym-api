@@ -22,9 +22,11 @@ class StoreExerciseLogRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->merge([
-            'date' => now(),
-        ]);
+        if (!$this->filled('date')) {
+            $this->merge([
+                'date' => now(),
+            ]);
+        }
     }
 
     public function rules(): array
