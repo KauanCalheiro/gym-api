@@ -20,15 +20,6 @@ class UpdateExerciseLogRequest extends FormRequest
         $this->exerciseLog = new ExerciseLog();
     }
 
-    protected function prepareForValidation()
-    {
-        if (!$this->has('date')) {
-            $this->merge([
-                'date' => now(),
-            ]);
-        }
-    }
-
     public function rules(): array
     {
         return [
@@ -39,10 +30,6 @@ class UpdateExerciseLogRequest extends FormRequest
             'exercise_id' => [
                 'sometimes',
                 "exists:{$this->exercise->getTable()},{$this->exercise->getKeyName()}",
-            ],
-            'date' => [
-                'sometimes',
-                'date',
             ],
             'sets' => [
                 'sometimes',
