@@ -17,6 +17,12 @@ class Exercise extends Model
         'gif',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
     public function muscleGroup()
     {
         return $this->belongsTo(MuscleGroup::class);

@@ -19,6 +19,12 @@ class WorkoutExercise extends Model
         'weight',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
     public function exercise()
     {
         return $this->belongsTo(Exercise::class);
