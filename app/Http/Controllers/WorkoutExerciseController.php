@@ -17,7 +17,7 @@ class WorkoutExerciseController extends Controller
 
     public function __construct(WorkoutExerciseService $workoutExerciseService)
     {
-        $this->authorizeResource(WorkoutExercise::class, 'workoutExercise');
+        $this->authorizeResource(WorkoutExercise::class, 'workout_exercise');
         $this->workoutExerciseService = $workoutExerciseService;
     }
 

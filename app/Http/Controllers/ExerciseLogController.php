@@ -17,7 +17,7 @@ class ExerciseLogController extends Controller
 
     public function __construct(ExerciseLogService $exerciseLogService)
     {
-        $this->authorizeResource(ExerciseLog::class, 'exerciseLog');
+        $this->authorizeResource(ExerciseLog::class, 'exercise_log');
         $this->exerciseLogService = $exerciseLogService;
     }
 
