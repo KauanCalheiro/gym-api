@@ -2,10 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Exercise;
 use App\Models\ExerciseLog;
-use App\Models\MuscleGroup;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
 use Tests\Helpers\JsonPagination;
@@ -59,22 +56,7 @@ class ExerciseLogTest extends TestCase
 
     public function test_exibe_registro_existente()
     {
-        $user        = User::factory()->create();
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
-
-        $exerciseLog = ExerciseLog::create([
-            'user_id'     => $user->id,
-            'exercise_id' => $exercise->id,
-            'date'        => '2025-10-17',
-            'sets'        => 3,
-            'reps'        => 10,
-            'weight'      => 45.0,
-        ]);
+        $exerciseLog = ExerciseLog::factory()->create();
 
         $response = $this->getJson(route("{$this->route}.show", $exerciseLog->id));
 
@@ -91,40 +73,19 @@ class ExerciseLogTest extends TestCase
 
     public function test_cria_registro()
     {
-        $user        = User::factory()->create();
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
+        $exerciseLog = ExerciseLog::factory()->make();
 
-        $data = [
-            'user_id'     => $user->id,
-            'exercise_id' => $exercise->id,
-            'sets'        => 3,
-            'reps'        => 10,
-            'weight'      => 45.0,
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), $exerciseLog->toArray());
 
         $response->assertStatus(201)
-            ->assertJsonFragment($data);
+            ->assertJsonFragment($exerciseLog->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $exerciseLog->toArray());
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
     {
-        $data = [
-            'user_id'     => null,
-            'exercise_id' => null,
-            'sets'        => 0,
-            'reps'        => 0,
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['user_id', 'exercise_id', 'sets', 'reps']);
@@ -132,30 +93,10 @@ class ExerciseLogTest extends TestCase
 
     public function test_atualiza_registro()
     {
-        $user        = User::factory()->create();
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
+        $exerciseLog = ExerciseLog::factory()->create();
+        $updatedData = ExerciseLog::factory()->make();
 
-        $exerciseLog = ExerciseLog::create([
-            'user_id'     => $user->id,
-            'exercise_id' => $exercise->id,
-            'date'        => '2025-10-17',
-            'sets'        => 3,
-            'reps'        => 10,
-            'weight'      => 45.0,
-        ]);
-
-        $data = [
-            'sets'   => 4,
-            'reps'   => 12,
-            'weight' => 50.0,
-        ];
-
-        $response = $this->putJson(route("{$this->route}.update", $exerciseLog->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $exerciseLog->id), $updatedData->toArray());
 
         $exerciseLog->refresh();
 
@@ -167,26 +108,11 @@ class ExerciseLogTest extends TestCase
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $user        = User::factory()->create();
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
-
-        $exerciseLog = ExerciseLog::create([
-            'user_id'     => $user->id,
-            'exercise_id' => $exercise->id,
-            'date'        => '2025-10-17',
-            'sets'        => 3,
-            'reps'        => 10,
-            'weight'      => 45.0,
-        ]);
+        $exerciseLog = ExerciseLog::factory()->create();
 
         $data = [
             'sets'    => -1,
-            'user_id' => 99999,
+            'user_id' => -1,
         ];
 
         $response = $this->putJson(route("{$this->route}.update", $exerciseLog->id), $data);
@@ -196,22 +122,7 @@ class ExerciseLogTest extends TestCase
 
     public function test_deleta_registro()
     {
-        $user        = User::factory()->create();
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
-
-        $exerciseLog = ExerciseLog::create([
-            'user_id'     => $user->id,
-            'exercise_id' => $exercise->id,
-            'date'        => '2025-10-17',
-            'sets'        => 3,
-            'reps'        => 10,
-            'weight'      => 45.0,
-        ]);
+        $exerciseLog = ExerciseLog::factory()->create();
 
         $response = $this->deleteJson(route("{$this->route}.destroy", $exerciseLog->id));
 

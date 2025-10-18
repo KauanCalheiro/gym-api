@@ -3,10 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Exercise;
-use App\Models\MuscleGroup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
 use Tests\Helpers\JsonPagination;
 use Tests\TestCase;
@@ -59,13 +57,7 @@ class ExerciseTest extends TestCase
 
     public function test_exibe_registro_existente()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-
-        $exercise = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
+        $exercise = Exercise::factory()->create();
 
         $response = $this->getJson(route("{$this->route}.show", $exercise->id));
 
@@ -85,35 +77,23 @@ class ExerciseTest extends TestCase
 
     public function test_cria_registro()
     {
-        Storage::fake('public');
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
+        $exercise      = Exercise::factory()->make();
+        $exercise->gif = UploadedFile::fake()->create('exercise.gif');
 
-        $file = UploadedFile::fake()->create('exercise.gif', 100, 'image/gif');
+        $response = $this->postJson(route("{$this->route}.store"), $exercise->toArray());
 
-        $data = [
-            'name'            => 'Supino Reto',
-            'muscle_group_id' => $muscleGroup->id,
-            'gif'             => $file,
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
-
-        unset($data['gif']);
+        $array = $exercise->toArray();
+        unset($array['gif']);
 
         $response->assertStatus(201)
-            ->assertJsonFragment($data);
+            ->assertJsonFragment($array);
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $array);
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
     {
-        $data = [
-            'name'            => '',
-            'muscle_group_id' => null,
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name', 'muscle_group_id', 'gif']);
@@ -121,18 +101,11 @@ class ExerciseTest extends TestCase
 
     public function test_atualiza_registro()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Inclinado',
-            'gif'             => 'supino.gif',
-        ]);
+        $exercise             = Exercise::factory()->create();
+        $updatedExercise      = Exercise::factory()->make();
+        $updatedExercise->gif = UploadedFile::fake()->create('updated_exercise.gif');
 
-        $data = [
-            'name' => 'Supino Inclinado Atualizado',
-        ];
-
-        $response = $this->putJson(route("{$this->route}.update", $exercise->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $exercise->id), $updatedExercise->toArray());
 
         $exercise->refresh();
 
@@ -147,12 +120,7 @@ class ExerciseTest extends TestCase
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Inclinado',
-            'gif'             => 'supino.gif',
-        ]);
+        $exercise = Exercise::factory()->create();
 
         $data = [
             'muscle_group_id' => -1,
@@ -166,12 +134,7 @@ class ExerciseTest extends TestCase
 
     public function test_deleta_registro()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
-        $exercise    = Exercise::create([
-            'muscle_group_id' => $muscleGroup->id,
-            'name'            => 'Supino Reto',
-            'gif'             => 'supino.gif',
-        ]);
+        $exercise = Exercise::factory()->create();
 
         $response = $this->deleteJson(route("{$this->route}.destroy", $exercise->id));
 

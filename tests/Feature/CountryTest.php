@@ -117,14 +117,14 @@ class CountryTest extends TestCase implements CrudTestContract, SearchTestContra
 
     public function test_cria_registro()
     {
-        $data = ['name' => 'URUGUAY', 'code' => 'URY'];
+        $country = Country::factory()->make();
 
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), $country->toArray());
 
         $response->assertCreated()
-                 ->assertJsonFragment($data);
+                 ->assertJsonFragment($country->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $country->toArray());
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
@@ -140,30 +140,25 @@ class CountryTest extends TestCase implements CrudTestContract, SearchTestContra
 
     public function test_atualiza_registro()
     {
-        $data = [
-            'name' => 'TEST PAIS',
-            'code' => 'TP',
-        ];
+        $country        = Country::factory()->create();
+        $updatedCountry = Country::factory()->make();
 
-        $country = Country::firstOrCreate(
-            $data,
-        );
-
-        $response = $this->putJson(route("{$this->route}.update", $country->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $country->id), $updatedCountry->toArray());
 
         $response->assertStatus(200)
-            ->assertJsonFragment($data);
+            ->assertJsonFragment($updatedCountry->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $updatedCountry->toArray());
     }
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $data = ['name' => 'URUGUAY', 'code' => 'TOO_LONG'];
+        $country = Country::factory()->create();
 
-        $country = Country::firstOrCreate(
-            ['name' => 'URUGUAY', 'code' => 'URY'],
-        );
+        $data = [
+            'name' => $country->name,
+            'code' => 'TOO_LONG',
+        ];
 
         $response = $this->putJson(route("{$this->route}.update", $country->id), $data);
 
@@ -174,11 +169,7 @@ class CountryTest extends TestCase implements CrudTestContract, SearchTestContra
 
     public function test_deleta_registro()
     {
-        $country = Country::latest('id')->first();
-
-        if (!$country) {
-            $this->markTestSkipped('No Pais records found.');
-        }
+        $country = Country::factory()->create();
 
         $response = $this->deleteJson(route("{$this->route}.destroy", $country->id));
 

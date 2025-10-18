@@ -49,7 +49,6 @@ class MuscleGroupTest extends TestCase
 
     public function test_erro_listagem_com_filtros_incorretos()
     {
-        // Test with invalid filter - API returns 400 for invalid filters
         $response = $this->getJson(
             route("{$this->route}.index", ['filter[invalid_field]' => 'test']),
         );
@@ -59,44 +58,36 @@ class MuscleGroupTest extends TestCase
 
     public function test_exibe_registro_existente()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
+        $muscleGroup = MuscleGroup::factory()->create();
 
         $response = $this->getJson(route("{$this->route}.show", $muscleGroup->id));
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Peitoral']);
+            ->assertJsonFragment(['name' => $muscleGroup->name]);
     }
 
     public function test_exibe_registro_inexistente()
     {
-        $response = $this->getJson(route("{$this->route}.show", 99999));
+        $response = $this->getJson(route("{$this->route}.show", -1));
 
         $response->assertStatus(404);
     }
 
     public function test_cria_registro()
     {
-        $data = [
-            'name' => 'Peitoral',
-        ];
+        $muscleGroup = MuscleGroup::factory()->make();
 
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), $muscleGroup->toArray());
 
         $response->assertStatus(201)
-            ->assertJsonFragment(['name' => 'Peitoral']);
+            ->assertJsonFragment($muscleGroup->toArray());
 
-        $this->assertDatabaseHas($this->table, [
-            'name' => 'Peitoral',
-        ]);
+        $this->assertDatabaseHas($this->table, $muscleGroup->toArray());
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
     {
-        $data = [
-            'name' => '', // Campo obrigatório vazio
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
@@ -104,29 +95,25 @@ class MuscleGroupTest extends TestCase
 
     public function test_atualiza_registro()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
+        $muscleGroup        = MuscleGroup::factory()->create();
+        $updatedMuscleGroup = MuscleGroup::factory()->make();
 
-        $data = [
-            'name' => 'Peitoral Atualizado',
-        ];
-
-        $response = $this->putJson(route("{$this->route}.update", $muscleGroup->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $muscleGroup->id), $updatedMuscleGroup->toArray());
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Peitoral Atualizado']);
+            ->assertJsonFragment($updatedMuscleGroup->toArray());
 
-        $this->assertDatabaseHas($this->table, [
-            'id' => $muscleGroup->id,
-            'name' => 'Peitoral Atualizado',
-        ]);
+        $muscleGroup->refresh();
+
+        $this->assertDatabaseHas($this->table, $muscleGroup->toArray());
     }
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
+        $muscleGroup = MuscleGroup::factory()->create();
 
         $data = [
-            'name' => '', // Campo obrigatório vazio
+            'name' => '',
         ];
 
         $response = $this->putJson(route("{$this->route}.update", $muscleGroup->id), $data);
@@ -137,21 +124,18 @@ class MuscleGroupTest extends TestCase
 
     public function test_deleta_registro()
     {
-        $muscleGroup = MuscleGroup::create(['name' => 'Peitoral']);
+        $muscleGroup = MuscleGroup::factory()->create();
 
         $response = $this->deleteJson(route("{$this->route}.destroy", $muscleGroup->id));
 
         $response->assertStatus(204);
 
-        $this->assertDatabaseMissing($this->table, [
-            'id' => $muscleGroup->id,
-            'deleted_at' => null,
-        ]);
+        $this->assertSoftDeleted($this->table, ['id' => $muscleGroup->id]);
     }
 
     public function test_erro_deleta_registro_inexistente()
     {
-        $response = $this->deleteJson(route("{$this->route}.destroy", 99999));
+        $response = $this->deleteJson(route("{$this->route}.destroy", -1));
 
         $response->assertStatus(404);
     }

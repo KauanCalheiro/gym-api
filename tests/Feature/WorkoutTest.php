@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Workout;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
@@ -57,12 +56,7 @@ class WorkoutTest extends TestCase
 
     public function test_exibe_registro_existente()
     {
-        $user    = User::factory()->create();
-        $workout = Workout::create([
-            'user_id'     => $user->id,
-            'name'        => 'Treino A',
-            'description' => 'Treino focado em peitorais',
-        ]);
+        $workout = Workout::factory()->create();
 
         $response = $this->getJson(route("{$this->route}.show", $workout->id));
 
@@ -79,20 +73,14 @@ class WorkoutTest extends TestCase
 
     public function test_cria_registro()
     {
-        $user = User::factory()->create();
+        $workout = Workout::factory()->make();
 
-        $data = [
-            'name'        => 'Treino A - Peito e Tríceps',
-            'user_id'     => $user->id,
-            'description' => 'Treino focado em peitorais e tríceps',
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), $workout->toArray());
 
         $response->assertStatus(201)
-            ->assertJsonFragment($data);
+            ->assertJsonFragment($workout->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $workout->toArray());
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
@@ -110,36 +98,22 @@ class WorkoutTest extends TestCase
 
     public function test_atualiza_registro()
     {
-        $user    = User::factory()->create();
-        $workout = Workout::create([
-            'user_id'     => $user->id,
-            'name'        => 'Treino B',
-            'description' => 'Treino focado em costas',
-        ]);
+        $workout        = Workout::factory()->create();
+        $updatedWorkout = Workout::factory()->make();
 
-        $data = [
-            'name'        => 'Treino B - Costas e Bíceps Atualizado',
-            'description' => 'Descrição atualizada',
-        ];
-
-        $response = $this->putJson(route("{$this->route}.update", $workout->id), $data);
-
-        $workout->refresh();
+        $response = $this->putJson(route("{$this->route}.update", $workout->id), $updatedWorkout->toArray());
 
         $response->assertStatus(200)
-            ->assertJsonFragment($workout->toArray());
+        ->assertJsonFragment($updatedWorkout->toArray());
+
+        $workout->refresh();
 
         $this->assertDatabaseHas($this->table, $workout->toArray());
     }
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $user    = User::factory()->create();
-        $workout = Workout::create([
-            'user_id'     => $user->id,
-            'name'        => 'Treino B',
-            'description' => 'Treino focado em costas',
-        ]);
+        $workout = Workout::factory()->create();
 
         $data = [
             'user_id' => -1,
@@ -153,12 +127,7 @@ class WorkoutTest extends TestCase
 
     public function test_deleta_registro()
     {
-        $user    = User::factory()->create();
-        $workout = Workout::create([
-            'user_id'     => $user->id,
-            'name'        => 'Treino A',
-            'description' => 'Treino focado em peitorais',
-        ]);
+        $workout = Workout::factory()->create();
 
         $response = $this->deleteJson(route("{$this->route}.destroy", $workout->id));
 

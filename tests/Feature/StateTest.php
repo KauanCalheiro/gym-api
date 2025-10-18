@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Location\Country;
 use App\Models\Location\State;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Contracts\CrudTestContract;
@@ -154,24 +153,14 @@ class StateTest extends TestCase implements
 
     public function test_cria_registro()
     {
-        $country = Country::first();
+        $state = State::factory()->make();
 
-        if (!$country) {
-            $this->markTestSkipped('No Pais records found.');
-        }
-
-        $data = [
-            'name'       => 'TEST ESTADO',
-            'code'       => 'TE',
-            'country_id' => (int)$country->id,
-        ];
-
-        $response = $this->postJson(route("{$this->route}.store"), $data);
+        $response = $this->postJson(route("{$this->route}.store"), $state->toArray());
 
         $response->assertCreated()
-            ->assertJsonFragment($data);
+            ->assertJsonFragment($state->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $this->assertDatabaseHas($this->table, $state->toArray());
     }
 
     public function test_erro_cria_registro_com_campos_incorretos()
@@ -191,59 +180,28 @@ class StateTest extends TestCase implements
 
     public function test_atualiza_registro()
     {
-        $country = Country::first();
+        $state        = State::factory()->create();
+        $updatedState = State::factory()->make();
 
-        if (!$country) {
-            $this->markTestSkipped('No Pais records found.');
-        }
-
-        $data = [
-            'name'       => 'TEST ESTADO',
-            'code'       => 'TE',
-            'country_id' => (int)$country->id,
-        ];
-
-        $estado = State::firstOrCreate(
-            $data,
-        );
-
-        $this->assertDatabaseHas($this->table, $estado->toArray());
-
-        $data['name'] = 'TEST ESTADO ATUALIZADO';
-
-        $response = $this->putJson(route("{$this->route}.update", $estado->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $state->id), $updatedState->toArray());
 
         $response->assertStatus(200)
-            ->assertJsonFragment($data);
+        ->assertJsonFragment($updatedState->toArray());
 
-        $this->assertDatabaseHas($this->table, $data);
+        $state->refresh();
+
+        $this->assertDatabaseHas($this->table, $state->toArray());
     }
 
     public function test_erro_atualiza_registro_com_campos_incorretos()
     {
-        $country = Country::first();
-
-        if (!$country) {
-            $this->markTestSkipped('No Pais records found.');
-        }
-
-        $data = [
-            'name'       => 'TEST ESTADO',
-            'code'       => 'TE',
-            'country_id' => (int)$country->id,
-        ];
-
-        $estado = State::firstOrCreate(
-            $data,
-        );
-
-        $this->assertDatabaseHas($this->table, $estado->toArray());
+        $state = State::factory()->create();
 
         $data = [
             'code' => 'LOONG',
         ];
 
-        $response = $this->putJson(route("{$this->route}.update", $estado->id), $data);
+        $response = $this->putJson(route("{$this->route}.update", $state->id), $data);
 
         $response->assertStatus(422)
             ->assertJsonStructure(JsonValidationError::STRUCTURE)
@@ -252,17 +210,13 @@ class StateTest extends TestCase implements
 
     public function test_deleta_registro()
     {
-        $estado = State::first();
+        $state = State::factory()->create();
 
-        if (!$estado) {
-            $this->markTestSkipped('No Estado records found.');
-        }
-
-        $response = $this->deleteJson(route("{$this->route}.destroy", $estado->id));
+        $response = $this->deleteJson(route("{$this->route}.destroy", $state->id));
 
         $response->assertStatus(204);
 
-        $this->assertSoftDeleted($this->table, $estado->toArray());
+        $this->assertSoftDeleted($this->table, $state->toArray());
     }
 
     public function test_erro_deleta_registro_inexistente()
