@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Location\Country;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Contracts\CrudTestContract;
 use Tests\Contracts\SearchTestContract;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
@@ -17,7 +16,6 @@ use Tests\Trait\Authenticatable;
 class CountryTest extends TestCase implements CrudTestContract, SearchTestContract
 {
     use Authenticatable;
-    use RefreshDatabase;
 
     protected Model $model;
     protected string $table;
@@ -26,8 +24,6 @@ class CountryTest extends TestCase implements CrudTestContract, SearchTestContra
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->seed();
 
         $this->model = new Country();
         $this->route = 'country';

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Location\City;
 use App\Models\Location\State;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Contracts\CrudTestContract;
 use Tests\Contracts\IncludeTestContract;
 use Tests\Contracts\SearchTestContract;
@@ -22,7 +21,6 @@ class CityTest extends TestCase implements
     IncludeTestContract
 {
     use Authenticatable;
-    use RefreshDatabase;
 
     protected Model $model;
     protected string $table;
@@ -31,8 +29,6 @@ class CityTest extends TestCase implements
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->seed();
 
         $this->model = new City();
         $this->route = 'city';

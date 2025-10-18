@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Location\Country;
 use App\Models\Location\State;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Contracts\CrudTestContract;
 use Tests\Contracts\IncludeTestContract;
 use Tests\Contracts\SearchTestContract;
@@ -22,7 +21,6 @@ class StateTest extends TestCase implements
     IncludeTestContract
 {
     use Authenticatable;
-    use RefreshDatabase;
 
     protected Model $model;
     protected string $table;
@@ -31,8 +29,6 @@ class StateTest extends TestCase implements
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->seed();
 
         $this->model = new State();
         $this->route = 'state';
