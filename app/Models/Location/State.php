@@ -3,13 +3,13 @@
 namespace App\Models\Location;
 
 use App\Traits\LogsAll;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class State extends Model
 {
-    use SoftDeletes;
-    use LogsAll;
+    use HasFactory, SoftDeletes, LogsAll;
 
     public $table = 'state';
 
