@@ -10,13 +10,15 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::create([
-            'name'     => 'Admin',
-            'email'    => 'admin@example.com',
-            'password' => bcrypt('admin'),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'     => 'Admin',
+                'password' => bcrypt('admin'),
+            ]
+        );
 
-        $admin->assignRole([
+        $admin->syncRoles([
             RoleEnum::ADMIN->value,
             RoleEnum::USER->value,
         ]);

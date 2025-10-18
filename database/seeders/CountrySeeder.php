@@ -15,7 +15,10 @@ class CountrySeeder extends Seeder
         $countries = json_decode(File::get($jsonPath), true);
 
         collect($countries)->each(function ($country) {
-            Country::create($country);
+            Country::updateOrCreate(
+                ['id' => $country['id']],
+                $country
+            );
         });
     }
 }
