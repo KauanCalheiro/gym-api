@@ -14,13 +14,13 @@ class WorkoutFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'name' => $this->faker->randomElement([
+            'name' => $this->faker->unique()->randomElement([
                 'Treino A - Peito e Tríceps',
                 'Treino B - Costas e Bíceps',
                 'Treino C - Pernas',
                 'Treino D - Ombros e Abdômen',
                 'Treino Full Body',
-            ]),
+            ]) . ' ' . $this->faker->unique()->numberBetween(1, 999999),
             'description' => $this->faker->sentence(),
         ];
     }

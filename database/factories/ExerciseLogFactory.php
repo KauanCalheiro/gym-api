@@ -14,12 +14,12 @@ class ExerciseLogFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id'     => User::factory(),
             'exercise_id' => Exercise::factory(),
-            'date' => $this->faker->date(),
-            'sets' => $this->faker->numberBetween(3, 5),
-            'reps' => $this->faker->numberBetween(8, 15),
-            'weight' => $this->faker->randomFloat(1, 10, 100),
+            'date'        => $this->faker->date(),
+            'sets'        => $this->faker->numberBetween(3, 5),
+            'reps'        => $this->faker->numberBetween(8, 15),
+            'weight'      => $this->faker->randomFloat(1, 10, 100),
         ];
     }
 }

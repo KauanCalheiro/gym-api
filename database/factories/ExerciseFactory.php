@@ -14,7 +14,7 @@ class ExerciseFactory extends Factory
     {
         return [
             'muscle_group_id' => MuscleGroup::factory(),
-            'name' => $this->faker->randomElement([
+            'name' => $this->faker->unique()->randomElement([
                 'Supino Reto',
                 'Supino Inclinado',
                 'Supino Declinado',
@@ -30,7 +30,7 @@ class ExerciseFactory extends Factory
                 'Agachamento',
                 'Leg Press',
                 'Stiff',
-            ]),
+            ]) . ' ' . $this->faker->unique()->numberBetween(1, 999999),
             'gif' => $this->faker->filePath() . '.gif',
         ];
     }

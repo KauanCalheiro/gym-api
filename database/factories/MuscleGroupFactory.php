@@ -12,7 +12,7 @@ class MuscleGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->randomElement([
+            'name' => $this->faker->unique()->randomElement([
                 'Peitoral',
                 'Costas',
                 'Ombros',
@@ -21,7 +21,10 @@ class MuscleGroupFactory extends Factory
                 'Pernas',
                 'Abdômen',
                 'Glúteos',
-            ]),
+                'Antebraço',
+                'Trapézio',
+                'Panturrilha',
+            ]) . ' ' . $this->faker->unique()->numberBetween(1, 999999),
         ];
     }
 }

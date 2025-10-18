@@ -14,8 +14,8 @@ class StateFactory extends Factory
     {
         return [
             'country_id' => Country::factory(),
-            'name' => strtoupper($this->faker->state()),
-            'code' => strtoupper($this->faker->stateAbbr()),
+            'name' => strtoupper($this->faker->unique()->state()),
+            'code' => strtoupper($this->faker->unique()->stateAbbr()),
         ];
     }
 }

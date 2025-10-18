@@ -14,7 +14,7 @@ class CityFactory extends Factory
     {
         return [
             'state_id' => State::factory(),
-            'name' => strtoupper($this->faker->city()),
+            'name' => strtoupper($this->faker->unique()->city()),
         ];
     }
 }
