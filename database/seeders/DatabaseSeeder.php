@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             StateSeeder::class,
             CitySeeder::class,
             MuscleGroupSeeder::class,
+            WorkoutSeeder::class,
         ]);
     }
 }

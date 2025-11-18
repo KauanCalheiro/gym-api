@@ -1,112 +1,34 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "API",
+    "title": "Gym API",
     "version": "1.0.0",
-    "description": "Docs"
+    "description": "API completa para gerenciamento de academia, exercícios, treinos e registros"
   },
   "servers": [
     {
-      "url": "http://localhost:8000/api/v1"
+      "url": "http://localhost:8000/api/v1",
+      "description": "Servidor de desenvolvimento"
     }
   ],
   "paths": {
     "/auth/login": {
-      "parameters": [],
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "Login",
         "security": [],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "token": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE3NTY4MTgzODEsImV4cCI6MTc1NjgyMTk4MSwibmJmIjoxNzU2ODE4MzgxLCJqdGkiOiJ3bkgwczF0SGN4WjJVUjMwIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.sBLuWEKiPaSb7xVpHIiH05lrDde5TVqg6Ok9pU0BhuQ"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Credentials Do Not Match",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "format": "style"
-                    }
-                  }
-                },
-                "example": {
-                  "error": "Login failed: These credentials do not match our records."
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "email": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "password": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The email field is required. (and 1 more error)",
-                  "errors": {
-                    "email": [
-                      "The email field is required."
-                    ],
-                    "password": [
-                      "The password field is required."
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -114,59 +36,51 @@
                   },
                   "password": {
                     "type": "string"
+                  },
+                  "remember_me": {
+                    "type": "boolean",
+                    "description": "Quando verdadeiro emite um token com expiração estendida.",
+                    "default": false
+                  },
+                  "driver": {
+                    "type": "string",
+                    "enum": [
+                      "sanctum"
+                    ],
+                    "description": "Driver de autenticação (atualmente apenas sanctum).",
+                    "default": "sanctum"
                   }
                 }
               },
               "example": {
                 "email": "admin@example.com",
-                "password": "admin"
+                "password": "admin",
+                "remember_me": false,
+                "driver": "sanctum"
               }
             }
           }
-        }
-      }
-    },
-    "/auth/logout": {
-      "parameters": [],
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Logout",
-        "parameters": [],
+        },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Login realizado com sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "message": "Logged out successfully"
+                  "$ref": "#/components/schemas/AuthToken"
                 }
               }
             }
           },
-          "500": {
-            "description": "Invalid Token",
+          "401": {
+            "description": "Credenciais inválidas"
+          },
+          "422": {
+            "description": "Erro de validação",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "error": "Token could not be parsed from the request."
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -175,100 +89,37 @@
       }
     },
     "/auth/register": {
-      "parameters": [],
       "post": {
         "tags": [
           "Auth"
         ],
-        "summary": "Register",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "token": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3NTY4MjY0NDgsImV4cCI6MTc1NjgzMDA0OCwibmJmIjoxNzU2ODI2NDQ4LCJqdGkiOiI5SVBsYlR4Z3Z3eGxteHFIIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.ymQTAatRYSg_PoFebSlkM-eHo9wSGuxo0yzBFDctddU"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "email": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "password": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The name field is required. (and 2 more errors)",
-                  "errors": {
-                    "name": [
-                      "The name field is required."
-                    ],
-                    "email": [
-                      "The email field is required."
-                    ],
-                    "password": [
-                      "The password field is required."
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
+        "summary": "Registrar novo usuário",
+        "security": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password",
+                  "password_confirmation"
+                ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 255
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "maxLength": 255
                   },
                   "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                   },
                   "password_confirmation": {
                     "type": "string"
@@ -276,10 +127,75 @@
                 }
               },
               "example": {
-                "name": "Teste",
-                "email": "teste@teste.gmail.com",
-                "password": "teste123",
-                "password_confirmation": "teste123"
+                "name": "João Silva",
+                "email": "joao@example.com",
+                "password": "senha12345",
+                "password_confirmation": "senha12345"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthToken"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Obter usuário autenticado",
+        "responses": {
+          "200": {
+            "description": "Dados do usuário autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout",
+        "responses": {
+          "200": {
+            "description": "Logout realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Logged out successfully"
+                }
               }
             }
           }
@@ -287,125 +203,24 @@
       }
     },
     "/auth/active-role": {
-      "parameters": [],
       "post": {
         "tags": [
           "Auth"
         ],
-        "summary": "Set User Active Role",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "active_role": {
-                      "type": "string"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "permissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "active_role": "admin",
-                  "roles": [
-                    "admin",
-                    "user"
-                  ],
-                  "permissions": [
-                    "user.create",
-                    "user.read",
-                    "user.update",
-                    "user.delete",
-                    "user.assign.role",
-                    "user.revoke.role",
-                    "user.sync.role",
-                    "country.create",
-                    "country.read",
-                    "country.update",
-                    "country.delete",
-                    "state.create",
-                    "state.read",
-                    "state.update",
-                    "state.delete",
-                    "city.create",
-                    "city.read",
-                    "city.update",
-                    "city.delete"
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "role": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The role field is required.",
-                  "errors": {
-                    "role": [
-                      "The role field is required."
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
+        "summary": "Ativar role do usuário",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "role"
+                ],
                 "properties": {
                   "role": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Nome da role que já precisa estar atribuída ao usuário autenticado."
                   }
                 }
               },
@@ -414,399 +229,25 @@
               }
             }
           }
-        }
-      }
-    },
-    "/auth/user": {
-      "parameters": [],
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Get Authenticated User",
-        "parameters": [],
+        },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Role ativada com sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "active_role": {
-                      "type": "string"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "permissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "active_role": "admin",
-                  "roles": [
-                    "admin",
-                    "user"
-                  ],
-                  "permissions": [
-                    "user.create",
-                    "user.read",
-                    "user.update",
-                    "user.delete",
-                    "user.assign.role",
-                    "user.revoke.role",
-                    "user.sync.role",
-                    "country.create",
-                    "country.read",
-                    "country.update",
-                    "country.delete",
-                    "state.create",
-                    "state.read",
-                    "state.update",
-                    "state.delete",
-                    "city.create",
-                    "city.read",
-                    "city.update",
-                    "city.delete"
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/user/{user_id}/roles/assign": {
-      "parameters": [],
-      "post": {
-        "tags": [
-          "User Role"
-        ],
-        "summary": "Assign",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "roles": [
-                    "admin",
-                    "user"
-                  ]
+                  "$ref": "#/components/schemas/AuthUser"
                 }
               }
             }
           },
           "422": {
-            "description": "Unprocessable Content",
+            "description": "Erro de validação",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "roles": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The roles field is required.",
-                  "errors": {
-                    "roles": [
-                      "The roles field is required."
-                    ]
-                  }
+                  "$ref": "#/components/schemas/ValidationError"
                 }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "roles": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "example": {
-                "roles": [
-                  "admin",
-                  "user"
-                ]
-              }
-            }
-          }
-        }
-      }
-    },
-    "/user/{user_id}/roles/revoke": {
-      "parameters": [],
-      "post": {
-        "tags": [
-          "User Role"
-        ],
-        "summary": "Revoke",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "roles": [
-                    "admin"
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "roles": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The roles field is required.",
-                  "errors": {
-                    "roles": [
-                      "The roles field is required."
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "roles": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "example": {
-                "roles": [
-                  "user"
-                ]
-              }
-            }
-          }
-        }
-      }
-    },
-    "/user/{user_id}/roles/sync": {
-      "parameters": [],
-      "post": {
-        "tags": [
-          "User Role"
-        ],
-        "summary": "Sync",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "roles": [
-                    "admin",
-                    "user"
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "roles": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The roles field is required.",
-                  "errors": {
-                    "roles": [
-                      "The roles field is required."
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "roles": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "example": {
-                "roles": [
-                  "admin",
-                  "user"
-                ]
               }
             }
           }
@@ -814,341 +255,137 @@
       }
     },
     "/user": {
-      "parameters": [],
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Listar usuários",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[name]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por nome"
+          },
+          {
+            "name": "filter[email]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por email"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral (id, name)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: roles"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ordenar por: id, name, email"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de usuários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedUsers"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "User"
         ],
-        "summary": "Create User",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    }
-                  }
-                },
-                "example": {
-                  "id": 4,
-                  "name": "Teste 1",
-                  "email": "teste@create.gmail.com"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "email": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "password": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The name field is required. (and 2 more errors)",
-                  "errors": {
-                    "name": [
-                      "The name field is required."
-                    ],
-                    "email": [
-                      "The email field is required."
-                    ],
-                    "password": [
-                      "The password field is required."
-                    ]
+        "summary": "Criar usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password",
+                  "password_confirmation"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "description": "Deve corresponder ao campo password."
                   }
                 }
               }
             }
           }
         },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "password_confirmation": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "name": "Teste 1",
-                "email": "teste@create.gmail.com",
-                "password": "teste123",
-                "password_confirmation": "teste123"
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "summary": "Get All Users",
-        "parameters": [
-          {
-            "name": "filter[id]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filter[name]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filter[email]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filter[search]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "include",
-            "in": "query",
-            "required": false,
-            "example": "roles,rolesCount,rolesExists",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page[size]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page[number]",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Erro de validação",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string",
-                            "format": "email"
-                          }
-                        }
-                      }
-                    },
-                    "links": {
-                      "type": "object",
-                      "properties": {
-                        "first": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "last": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "prev": {
-                          "nullable": true
-                        },
-                        "next": {
-                          "nullable": true
-                        }
-                      }
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "current_page": {
-                          "type": "integer"
-                        },
-                        "from": {
-                          "type": "integer"
-                        },
-                        "last_page": {
-                          "type": "integer"
-                        },
-                        "links": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "url": {
-                                "nullable": true
-                              },
-                              "label": {
-                                "type": "string"
-                              },
-                              "page": {
-                                "nullable": true
-                              },
-                              "active": {
-                                "type": "boolean"
-                              }
-                            }
-                          }
-                        },
-                        "path": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "per_page": {
-                          "type": "integer"
-                        },
-                        "to": {
-                          "type": "integer"
-                        },
-                        "total": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "data": [
-                    {
-                      "id": 1,
-                      "name": "Admin",
-                      "email": "admin@example.com"
-                    },
-                    {
-                      "id": 2,
-                      "name": "Teste",
-                      "email": "teste@teste.gmail.com"
-                    },
-                    {
-                      "id": 3,
-                      "name": "Teste",
-                      "email": "teste@teste1.gmail.com"
-                    },
-                    {
-                      "id": 4,
-                      "name": "Teste 1",
-                      "email": "teste@create.gmail.com"
-                    }
-                  ],
-                  "links": {
-                    "first": "http://localhost:8000/api/v1/user?page%5Bnumber%5D=1",
-                    "last": "http://localhost:8000/api/v1/user?page%5Bnumber%5D=1",
-                    "prev": null,
-                    "next": null
-                  },
-                  "meta": {
-                    "current_page": 1,
-                    "from": 1,
-                    "last_page": 1,
-                    "links": [
-                      {
-                        "url": null,
-                        "label": "&laquo; Previous",
-                        "page": null,
-                        "active": false
-                      },
-                      {
-                        "url": "http://localhost:8000/api/v1/user?page%5Bnumber%5D=1",
-                        "label": "1",
-                        "page": 1,
-                        "active": true
-                      },
-                      {
-                        "url": null,
-                        "label": "Next &raquo;",
-                        "page": null,
-                        "active": false
-                      }
-                    ],
-                    "path": "http://localhost:8000/api/v1/user",
-                    "per_page": 10,
-                    "to": 4,
-                    "total": 4
-                  }
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Usuário criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -1156,96 +393,43 @@
         }
       }
     },
-    "/user/{user_id}": {
-      "parameters": [],
+    "/user/{id}": {
       "get": {
         "tags": [
           "User"
         ],
-        "summary": "Get User by ID",
+        "summary": "Visualizar usuário",
         "parameters": [
           {
-            "name": "include",
-            "in": "query",
-            "required": false,
-            "example": "roles,rolesCount,rolesExists",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           },
           {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
+            "name": "include",
+            "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Incluir relacionamentos: roles"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Dados do usuário",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "roles_count": {
-                      "type": "integer"
-                    },
-                    "roles_exists": {
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Admin",
-                  "email": "admin@example.com",
-                  "roles": [
-                    "admin",
-                    "user"
-                  ],
-                  "roles_count": 2,
-                  "roles_exists": true
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The requested resource was not found."
-                }
-              }
-            }
+            "description": "Usuário não encontrado"
           }
         }
       },
@@ -1253,98 +437,64 @@
         "tags": [
           "User"
         ],
-        "summary": "Update User",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    }
-                  }
-                },
-                "example": {
-                  "id": 2,
-                  "name": "Teste 1 Update",
-                  "email": "teste@update.gmail.com"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "email": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "error": "The name field is required. (and 1 more error)",
-                  "errors": {
-                    "name": [
-                      "The name field is required."
-                    ],
-                    "email": [
-                      "The email field is required."
-                    ]
-                  }
-                }
-              }
+        "summary": "Atualizar usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 255
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "maxLength": 255,
+                    "description": "Precisa ser único entre todos os usuários."
                   }
+                },
+                "required": [
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
-              },
-              "example": {
-                "name": "Teste 1 Update",
-                "email": "teste@update.gmail.com"
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
               }
             }
           }
@@ -1354,37 +504,1536 @@
         "tags": [
           "User"
         ],
-        "summary": "Delete User",
-        "parameters": [],
+        "summary": "Deletar usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "204": {
-            "description": "No Content",
+            "description": "Usuário deletado com sucesso"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      }
+    },
+    "/user/{id}/roles/assign": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Atribuir roles ao usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roles"
+                ],
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "roles": [
+                  "admin",
+                  "user"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retorna o usuário com roles atualizadas",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
-                },
-                "example": {}
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}/roles/revoke": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Revogar roles do usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roles"
+                ],
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retorna o usuário com roles atualizadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}/roles/sync": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Sincronizar roles do usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roles"
+                ],
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retorna o usuário com roles atualizadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/muscle-group": {
+      "get": {
+        "tags": [
+          "Muscle Group"
+        ],
+        "summary": "Listar grupos musculares",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[name]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por nome"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral (id, name)"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de grupos musculares",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedMuscleGroups"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Muscle Group"
+        ],
+        "summary": "Criar grupo muscular",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "example": {
+                "name": "Peitorais"
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Grupo muscular criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MuscleGroup"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/muscle-group/{id}": {
+      "get": {
+        "tags": [
+          "Muscle Group"
+        ],
+        "summary": "Visualizar grupo muscular",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do grupo muscular",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MuscleGroup"
+                }
               }
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
+            "description": "Grupo muscular não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Muscle Group"
+        ],
+        "summary": "Atualizar grupo muscular",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
                   }
-                },
-                "example": {
-                  "error": "The requested resource was not found."
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Grupo muscular atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MuscleGroup"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Grupo muscular não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Muscle Group"
+        ],
+        "summary": "Deletar grupo muscular",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Grupo muscular deletado com sucesso"
+          },
+          "404": {
+            "description": "Grupo muscular não encontrado"
+          }
+        }
+      }
+    },
+    "/exercise": {
+      "get": {
+        "tags": [
+          "Exercise"
+        ],
+        "summary": "Listar exercícios",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[name]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por nome"
+          },
+          {
+            "name": "filter[muscle_group_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por grupo muscular"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral (id, name, muscle_group_id, muscleGroup.name)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: muscleGroup"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de exercícios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedExercises"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Exercise"
+        ],
+        "summary": "Criar exercício",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "muscle_group_id",
+                  "gif"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "muscle_group_id": {
+                    "type": "integer"
+                  },
+                  "gif": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Arquivo GIF do exercício"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Exercício criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exercise/{id}": {
+      "get": {
+        "tags": [
+          "Exercise"
+        ],
+        "summary": "Visualizar exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: muscleGroup"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do exercício",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Exercício não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exercise"
+        ],
+        "summary": "Atualizar exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "muscle_group_id": {
+                    "type": "integer"
+                  },
+                  "gif": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "description": "Envie apenas os campos que deseja alterar. Para atualizar o GIF o conteúdo deve ser multipart/form-data."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercício atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Exercício não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exercise"
+        ],
+        "summary": "Deletar exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Exercício deletado com sucesso"
+          },
+          "404": {
+            "description": "Exercício não encontrado"
+          }
+        }
+      }
+    },
+    "/workout": {
+      "get": {
+        "tags": [
+          "Workout"
+        ],
+        "summary": "Listar treinos",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[name]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por nome"
+          },
+          {
+            "name": "filter[user_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por usuário"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral (id, name, user_id, user.name, description)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: user"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de treinos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedWorkouts"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Workout"
+        ],
+        "summary": "Criar treino",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "user_id"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              },
+              "example": {
+                "name": "Treino A - Peito e Tríceps",
+                "user_id": 1,
+                "description": "Treino focado em peitorais e tríceps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Treino criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workout"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workout/{id}": {
+      "get": {
+        "tags": [
+          "Workout"
+        ],
+        "summary": "Visualizar treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do treino",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workout"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Treino não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Workout"
+        ],
+        "summary": "Atualizar treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "description": "Todos os campos são opcionais; apenas os enviados serão atualizados."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Treino atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workout"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Treino não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workout"
+        ],
+        "summary": "Deletar treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Treino deletado com sucesso"
+          },
+          "404": {
+            "description": "Treino não encontrado"
+          }
+        }
+      }
+    },
+    "/workout-exercise": {
+      "get": {
+        "tags": [
+          "Workout Exercise"
+        ],
+        "summary": "Listar exercícios de treinos",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[exercise_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por exercício"
+          },
+          {
+            "name": "filter[workout_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por treino"
+          },
+          {
+            "name": "filter[sets]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por número de séries"
+          },
+          {
+            "name": "filter[reps]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por número de repetições"
+          },
+          {
+            "name": "filter[weight]",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Filtrar por peso"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: exercise, exercise.muscleGroup, workout, workout.user"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de exercícios de treinos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedWorkoutExercises"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Workout Exercise"
+        ],
+        "summary": "Adicionar exercício ao treino",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "exercise_id",
+                  "workout_id",
+                  "sets",
+                  "reps"
+                ],
+                "properties": {
+                  "exercise_id": {
+                    "type": "integer"
+                  },
+                  "workout_id": {
+                    "type": "integer"
+                  },
+                  "sets": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reps": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "nullable": true,
+                    "description": "Opcional, aceita valores nulos."
+                  }
+                }
+              },
+              "example": {
+                "exercise_id": 1,
+                "workout_id": 1,
+                "sets": 4,
+                "reps": 12,
+                "weight": 50.5
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Exercício adicionado ao treino com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutExercise"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workout-exercise/{id}": {
+      "get": {
+        "tags": [
+          "Workout Exercise"
+        ],
+        "summary": "Visualizar exercício de treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: exercise, exercise.muscleGroup, workout, workout.user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do exercício de treino",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutExercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Exercício de treino não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Workout Exercise"
+        ],
+        "summary": "Atualizar exercício de treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "exercise_id": {
+                    "type": "integer"
+                  },
+                  "workout_id": {
+                    "type": "integer"
+                  },
+                  "sets": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reps": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "nullable": true,
+                    "description": "Opcional, aceita valores nulos."
+                  }
+                },
+                "description": "Envie apenas os campos que precisam ser atualizados."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercício de treino atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutExercise"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Exercício de treino não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Workout Exercise"
+        ],
+        "summary": "Remover exercício do treino",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Exercício removido do treino com sucesso"
+          },
+          "404": {
+            "description": "Exercício de treino não encontrado"
+          }
+        }
+      }
+    },
+    "/exercise-log": {
+      "get": {
+        "tags": [
+          "Exercise Log"
+        ],
+        "summary": "Listar registros de exercícios",
+        "parameters": [
+          {
+            "name": "filter[id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID exato"
+          },
+          {
+            "name": "filter[user_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por usuário"
+          },
+          {
+            "name": "filter[exercise_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por exercício"
+          },
+          {
+            "name": "filter[date]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filtrar por data"
+          },
+          {
+            "name": "filter[sets]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por número de séries"
+          },
+          {
+            "name": "filter[reps]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por número de repetições"
+          },
+          {
+            "name": "filter[weight]",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Filtrar por peso"
+          },
+          {
+            "name": "filter[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca geral"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: user, exercise"
+          },
+          {
+            "$ref": "#/components/parameters/PageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de registros de exercícios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedExerciseLogs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Exercise Log"
+        ],
+        "summary": "Criar registro de exercício",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id",
+                  "exercise_id",
+                  "sets",
+                  "reps"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "exercise_id": {
+                    "type": "integer"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Data do registro (opcional, usa data atual se não informado)"
+                  },
+                  "sets": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reps": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "nullable": true,
+                    "description": "Opcional, aceita valores nulos."
+                  }
+                }
+              },
+              "example": {
+                "user_id": 1,
+                "exercise_id": 1,
+                "date": "2025-10-17",
+                "sets": 3,
+                "reps": 10,
+                "weight": 45.0
+              }
+            }
+          }
+        },
+        "responses": {
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Registro de exercício criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseLog"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exercise-log/{id}": {
+      "get": {
+        "tags": [
+          "Exercise Log"
+        ],
+        "summary": "Visualizar registro de exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Incluir relacionamentos: user, exercise"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do registro de exercício",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseLog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro de exercício não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exercise Log"
+        ],
+        "summary": "Atualizar registro de exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "exercise_id": {
+                    "type": "integer"
+                  },
+                  "sets": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reps": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "nullable": true
+                  }
+                },
+                "description": "Todos os campos são opcionais; apenas os enviados serão atualizados."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro de exercício atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseLog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro de exercício não encontrado"
+          },
+          "422": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exercise Log"
+        ],
+        "summary": "Deletar registro de exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Registro de exercício deletado com sucesso"
+          },
+          "404": {
+            "description": "Registro de exercício não encontrado"
           }
         }
       }
@@ -1396,6 +2045,530 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "message",
+          "errors"
+        ]
+      },
+      "AuthToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "AuthUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "active_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de roles atribuídas ao usuário autenticado."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Permissões agregadas das roles ativas."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "active_role",
+          "roles",
+          "permissions"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Disponível apenas quando include=roles é utilizado."
+          },
+          "roles_count": {
+            "type": "integer",
+            "description": "Presente quando roles_count é solicitado."
+          },
+          "roles_exists": {
+            "type": "boolean",
+            "description": "Presente quando roles_exists é solicitado."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ]
+      },
+      "MuscleGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "Exercise": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "muscle_group_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "gif": {
+            "type": "string",
+            "format": "uri"
+          },
+          "muscle_group": {
+            "description": "Incluído apenas quando include=muscleGroup é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MuscleGroup"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "muscle_group_id",
+          "name",
+          "gif"
+        ]
+      },
+      "Workout": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "user": {
+            "description": "Incluído apenas quando include=user é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "name"
+        ]
+      },
+      "WorkoutExercise": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "exercise_id": {
+            "type": "integer"
+          },
+          "workout_id": {
+            "type": "integer"
+          },
+          "sets": {
+            "type": "integer"
+          },
+          "reps": {
+            "type": "integer"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "exercise": {
+            "description": "Incluído apenas quando include=exercise é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            ]
+          },
+          "workout": {
+            "description": "Incluído apenas quando include=workout é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Workout"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "exercise_id",
+          "workout_id",
+          "sets",
+          "reps",
+          "weight"
+        ]
+      },
+      "ExerciseLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "exercise_id": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "sets": {
+            "type": "integer"
+          },
+          "reps": {
+            "type": "integer"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "user": {
+            "description": "Incluído apenas quando include=user é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ]
+          },
+          "exercise": {
+            "description": "Incluído apenas quando include=exercise é informado.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "exercise_id",
+          "date",
+          "sets",
+          "reps",
+          "weight"
+        ]
+      },
+      "PaginationLinks": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "last": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer"
+          },
+          "from": {
+            "type": "integer"
+          },
+          "last_page": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "per_page": {
+            "type": "integer"
+          },
+          "to": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaginatedUsers": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "PaginatedMuscleGroups": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroup"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "PaginatedExercises": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Exercise"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "PaginatedWorkouts": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Workout"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "PaginatedWorkoutExercises": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkoutExercise"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "PaginatedExerciseLogs": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExerciseLog"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/PaginationLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      }
+    },
+    "parameters": {
+      "PageNumber": {
+        "name": "page[number]",
+        "in": "query",
+        "description": "Número da página (JSON:API pagination).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "PageSize": {
+        "name": "page[size]",
+        "in": "query",
+        "description": "Quantidade de registros por página (máx. 50).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50,
+          "default": 10
+        }
       }
     }
   },

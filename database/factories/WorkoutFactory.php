@@ -14,7 +14,7 @@ class WorkoutFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'name' => $this->faker->unique()->randomElement([
+            'name'    => $this->faker->randomElement([
                 'Treino A - Peito e Tríceps',
                 'Treino B - Costas e Bíceps',
                 'Treino C - Pernas',

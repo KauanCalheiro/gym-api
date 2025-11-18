@@ -9,5 +9,13 @@
     "editor.stickyScroll.enabled": true,
     "[php]": {
         "editor.defaultFormatter": "junstyle.php-cs-fixer"
-    }
+    },
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "gym-api",
+            "database": "${workspaceFolder:gym-api}/database/database.sqlite"
+        }
+    ]
 }
