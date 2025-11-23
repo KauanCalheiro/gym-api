@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Workout;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
 use Tests\Helpers\JsonPagination;
 use Tests\TestCase;
@@ -12,6 +13,7 @@ use Tests\Trait\Authenticatable;
 class WorkoutTest extends TestCase
 {
     use Authenticatable;
+    use RefreshDatabase;
 
     protected Model $model;
     protected string $table;
@@ -20,6 +22,7 @@ class WorkoutTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed();
         $this->authenticate(JwtApiAuthenticatable::class);
 
         $this->model = new Workout();

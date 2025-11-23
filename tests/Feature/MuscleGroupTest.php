@@ -4,16 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\MuscleGroup;
 use Illuminate\Database\Eloquent\Model;
-use Tests\Contracts\CrudTestContract;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Helpers\Auth\JwtApiAuthenticatable;
 use Tests\Helpers\JsonPagination;
 use Tests\TestCase;
 use Tests\Trait\Authenticatable;
 
 class MuscleGroupTest extends TestCase
-    // implements CrudTestContract
 {
     use Authenticatable;
+    use RefreshDatabase;
 
     protected Model $model;
     protected string $table;
@@ -22,6 +22,7 @@ class MuscleGroupTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed();
         $this->authenticate(JwtApiAuthenticatable::class);
 
         $this->model = new MuscleGroup();
