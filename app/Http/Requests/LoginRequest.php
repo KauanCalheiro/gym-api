@@ -9,35 +9,26 @@ class LoginRequest extends FormRequest
     public function prepareForValidation(): void
     {
         $this->merge([
-            'driver' => $this->input('driver', 'sanctum'),
+            'driver' => $this->input('driver', 'jwt'),
         ]);
     }
 
     public function rules(): array
     {
-        $driver = $this->input('driver', 'sanctum');
+        $driver = $this->input('driver', 'jwt');
 
-        return match(true) {
-            $driver === 'sanctum' => $this->sanctumRules(),
-            $driver === 'google'  => $this->googleRules(),
+        return match($driver) {
+            'jwt' => $this->jwtRules(),
         };
     }
 
-    private function googleRules()
-    {
-        return [
-            'token'  => ['required', 'string'],
-            'driver' => ['in:sanctum,google'],
-        ];
-    }
-
-    private function sanctumRules()
+    private function jwtRules()
     {
         return [
             'email'       => ['required', 'string', 'email'],
             'password'    => ['required', 'string'],
             'remember_me' => ['boolean'],
-            'driver'      => ['in:sanctum,google'],
+            'driver'      => ['in:jwt'],
         ];
     }
 }

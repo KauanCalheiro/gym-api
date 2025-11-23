@@ -10,17 +10,19 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name'     => 'Admin',
-                'password' => bcrypt('admin'),
-            ]
-        );
+        $admin = User::create([
+            'name'     => 'Admin',
+            'email'    => 'admin@example.com',
+            'password' => bcrypt('admin'),
+        ]);
 
-        $admin->syncRoles([
+        $admin->assignRole([
             RoleEnum::ADMIN->value,
             RoleEnum::USER->value,
         ]);
+
+        User::factory(50)->create()->each(function (User $user) {
+            $user->assignRole(RoleEnum::USER->value);
+        });
     }
 }
