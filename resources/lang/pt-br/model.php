@@ -20,12 +20,5 @@ return [
     ],
 
     'name' => [
-        'country'           => 'País',
-        'state'             => 'Estado',
-        'city'              => 'Cidade',
-        'action'            => 'Ação',
-        'action_planning'   => 'Planejamento de Ação',
-        'extension_project' => 'Projeto de Extensão',
-        'extension_program' => 'Programa de Extensão',
     ],
 ];

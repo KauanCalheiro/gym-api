@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ActiveRoleRequest;
 use App\Http\Requests\LoginRequest;
@@ -43,8 +42,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         return DB::transaction(function () use ($request) {
-            $user = User::create($request->validated());
-            $user->assignRole(RoleEnum::USER->value);
+            User::create($request->validated());
 
             $loginRequest = FormRequestFactory::make(LoginRequest::class, $request->validated());
 
@@ -59,5 +57,15 @@ class AuthController extends Controller
         Auth::user()->setActiveRole($role);
 
         return $this->user();
+    }
+
+    public function impersonate(User $user)
+    {
+        return ['token' => Auth::user()->impersonate($user)];
+    }
+
+    public function unimpersonate()
+    {
+        return ['token' => Auth::user()->leaveImpersonation()];
     }
 }

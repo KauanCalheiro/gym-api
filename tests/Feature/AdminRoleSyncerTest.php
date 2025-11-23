@@ -8,10 +8,13 @@ use App\Models\Auth\Role;
 use App\Models\User;
 use App\Services\Role\Handler\AdminRoleHandler;
 use App\Services\Role\Syncer\RoleSyncerService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminRoleSyncerTest extends TestCase
 {
+    use RefreshDatabase;
+
     private AdminRoleHandler $handler;
     private RoleSyncerService $syncer;
     private Role $adminRole;
@@ -19,6 +22,8 @@ class AdminRoleSyncerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->seed();
 
         $this->adminRole = Role::firstOrFail(
             ['name' => RoleEnum::ADMIN->value],
