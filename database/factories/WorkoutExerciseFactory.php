@@ -14,11 +14,11 @@ class WorkoutExerciseFactory extends Factory
     public function definition(): array
     {
         return [
-            'exercise_id' => Exercise::factory(),
-            'workout_id' => Workout::factory(),
-            'sets' => $this->faker->numberBetween(3, 5),
-            'reps' => $this->faker->numberBetween(8, 15),
-            'weight' => $this->faker->randomFloat(1, 10, 100),
+            'exercise_id' => $this->faker->randomElement(Exercise::pluck('id')->toArray()),
+            'workout_id'  => $this->faker->randomElement(Workout::pluck('id')->toArray()),
+            'sets'        => $this->faker->numberBetween(3, 5),
+            'reps'        => $this->faker->numberBetween(8, 15),
+            'weight'      => $this->faker->randomFloat(1, 10, 100),
         ];
     }
 }

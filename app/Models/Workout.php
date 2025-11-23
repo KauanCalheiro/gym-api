@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Workout extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     public $table = 'workout';
 
@@ -27,5 +28,10 @@ class Workout extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function workout_exercises()
+    {
+        return $this->hasMany(WorkoutExercise::class, 'workout_id', 'id');
     }
 }

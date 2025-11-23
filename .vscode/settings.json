@@ -15,7 +15,7 @@
             "previewLimit": 50,
             "driver": "SQLite",
             "name": "gym-api",
-            "database": "${workspaceFolder:gym-api}/database/database.sqlite"
+            "database": "${workspaceFolder:api}/database/database.sqlite"
         }
     ]
 }

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Exercise;
 use Illuminate\Database\Seeder;
 
 class ExerciseSeeder extends Seeder
@@ -12,6 +12,6 @@ class ExerciseSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Exercise::factory(10)->create();
     }
 }

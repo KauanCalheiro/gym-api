@@ -23,8 +23,8 @@ return new class () extends Migration {
     {
         Schema::create($this->workoutExercise->getTable(), function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exercise_id')->constrained($this->exercise->getTable());
-            $table->foreignId('workout_id')->constrained($this->workout->getTable());
+            $table->integer('exercise_id');
+            $table->integer('workout_id');
             $table->integer('sets');
             $table->integer('reps');
             $table->float('weight')->nullable();

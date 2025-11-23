@@ -37,6 +37,7 @@ class ExerciseController extends Controller
                         'muscleGroup.name',
                     ]),
                 ),
+                AllowedFilter::belongsTo('workout_id', 'workouts'),
             ])
             ->allowedIncludes([
                 'muscleGroup',

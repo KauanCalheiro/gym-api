@@ -10,11 +10,12 @@ class WorkoutResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'user_id'     => $this->user_id,
-            'name'        => $this->name,
-            'description' => $this->description,
-            'user'        => new UserResource($this->whenLoaded('user')),
+            'id'                => $this->id,
+            'user_id'           => $this->user_id,
+            'name'              => $this->name,
+            'description'       => $this->description,
+            'user'              => new UserResource($this->whenLoaded('user')),
+            'workout_exercises' => WorkoutExerciseResource::collection($this->whenLoaded('workout_exercises')),
         ];
     }
 }

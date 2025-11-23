@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             RoleEnum::USER->value,
         ]);
 
-        User::factory(50)->create()->each(function (User $user) {
+        User::factory(20)->create()->each(function (User $user) {
             $user->assignRole(RoleEnum::USER->value);
         });
     }

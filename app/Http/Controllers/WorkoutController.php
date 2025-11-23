@@ -41,6 +41,8 @@ class WorkoutController extends Controller
             ])
             ->allowedIncludes([
                 'user',
+                'workout_exercises',
+                'workout_exercises.exercise',
             ])
             ->defaultSort('name')
             ->jsonPaginate();
@@ -61,6 +63,8 @@ class WorkoutController extends Controller
             ->where('id', $workout->id)
             ->allowedIncludes([
                 'user',
+                'workout_exercises',
+                'workout_exercises.exercise',
             ])
             ->firstOrFail();
 
